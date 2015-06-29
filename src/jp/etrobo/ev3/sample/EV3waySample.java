@@ -48,9 +48,6 @@ public class EV3waySample {
 	private static int counter = 0;
 	private static boolean alert = false;
 
-	private static Logger logger = new Logger();
-	private static int nowColor;
-
 	/**
 	 * メイン
 	 */
@@ -153,7 +150,9 @@ public class EV3waySample {
 					}
 				}
 
-				float gyroNow = body.getGyroValue(); // ジャイロセンサー値
+				//タッチセンサー位置対応（2016.06.29）
+				//float gyroNow = body.getGyroValue(); // ジャイロセンサー値
+				float gyroNow = -body.getGyroValue(); // ジャイロセンサー値
 				int thetaL = body.motorPortL.getTachoCount(); // 左モータ回転角度
 				int thetaR = body.motorPortR.getTachoCount(); // 右モータ回転角度
 				int battery = Battery.getVoltageMilliVolt(); // バッテリー電圧[mV]
@@ -161,9 +160,6 @@ public class EV3waySample {
 						thetaR, battery); // 倒立振子制御
 				body.motorPortL.controlMotor(Balancer.getPwmL(), 1); // 左モータPWM出力セット
 				body.motorPortR.controlMotor(Balancer.getPwmR(), 1); // 右モータPWM出力セット
-
-				nowColor = body.colorSensor.getColorID();
-				logger.writeLog(Integer.toString(nowColor));
 			}
 		};
 		driveTimer.scheduleAtFixedRate(driveTask, 0, 4);
