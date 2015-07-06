@@ -7,6 +7,7 @@
 package jp.etrobo.ev3.sample;
 
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.ServerSocket;
@@ -47,6 +48,8 @@ public class EV3waySample {
 	private static EV3Body body = new EV3Body();
 	private static int counter = 0;
 	private static boolean alert = false;
+
+	private static DataOutputStream outStream;
 
 	/**
 	 * メイン
@@ -92,6 +95,7 @@ public class EV3waySample {
 						client = server.accept();
 						inputStream = client.getInputStream();
 						dataInputStream = new DataInputStream(inputStream);
+						outStream = new DataOutputStream(client.getOutputStream());
 					} catch (IOException ex) {
 						ex.printStackTrace();
 						server = null;
@@ -132,10 +136,22 @@ public class EV3waySample {
 			public void run() {
 				tailControl(body, TAIL_ANGLE_DRIVE); // バランス走行用角度に制御
 
+				float brightness; // 輝度計測
+				brightness = body.getBrightness();
+
 				if (++counter >= 40 / 4) { // 約40msごとに障害物検知
 					alert = sonarAlert(body); // 障害物検知
 					counter = 0;
+
+					LCD.drawString(Float.toString(brightness), 0, 5);
+					// Bluetooth送信
+					try {
+						outStream.writeFloat(brightness);
+					} catch (Exception io) {
+						LCD.drawString("x_x", 0, 6);
+					}
 				}
+
 				float forward = 0.0F; // 前後進命令
 				float turn = 0.0F; // 旋回命令
 				if (alert) { // 障害物を検知したら停止
@@ -143,7 +159,8 @@ public class EV3waySample {
 					turn = 0.0F;
 				} else {
 					forward = 10.0F; // 前進命令
-					if (body.getBrightness() > THRESHOLD) {
+					if (brightness > THRESHOLD) {
+					//if (body.getBrightness() > THRESHOLD) {
 						turn = 50.0F; // 右旋回命令
 					} else {
 						turn = -50.0F; // 左旋回命令
@@ -160,6 +177,7 @@ public class EV3waySample {
 						thetaR, battery); // 倒立振子制御
 				body.motorPortL.controlMotor(Balancer.getPwmL(), 1); // 左モータPWM出力セット
 				body.motorPortR.controlMotor(Balancer.getPwmR(), 1); // 右モータPWM出力セット
+
 			}
 		};
 		driveTimer.scheduleAtFixedRate(driveTask, 0, 4);
