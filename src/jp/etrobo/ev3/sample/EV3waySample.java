@@ -26,17 +26,17 @@ import lejos.utility.Delay;
  */
 public class EV3waySample {
 	// 下記のパラメータはセンサ個体/環境に合わせてチューニングする必要があります
-	private static final float GYRO_OFFSET = 0.0F; // ジャイロセンサオフセット値
-	private static final float LIGHT_WHITE = 0.4F; // 白色のカラーセンサ輝度値
-	private static final float LIGHT_BLACK = 0.0F; // 黒色のカラーセンサ輝度値
+	private static final float GYRO_OFFSET          = 0.0F; // ジャイロセンサオフセット値
+	private static final float LIGHT_WHITE          = 0.4F; // 白色のカラーセンサ輝度値
+	private static final float LIGHT_BLACK          = 0.0F; // 黒色のカラーセンサ輝度値
 	private static final float SONAR_ALERT_DISTANCE = 0.3F; // 超音波センサによる障害物検知距離[m]
-	private static final int TAIL_ANGLE_STAND_UP = 90; // 完全停止時の角度[度]
-	private static final int TAIL_ANGLE_DRIVE = 3; // バランス走行時の角度[度]
-	private static final float P_GAIN = 2.5F; // 完全停止用モータ制御比例係数
-	private static final int PWM_ABS_MAX = 60; // 完全停止用モータ制御PWM絶対最大値
-	private static final int SOCKET_PORT = 7360; // PCと接続するポート
-	private static final int REMOTE_COMMAND_START = 71; // 'g'
-	private static final int REMOTE_COMMAND_STOP = 83; // 's'
+	private static final int   TAIL_ANGLE_STAND_UP  = 89;   // 完全停止時の角度[度]
+	private static final int   TAIL_ANGLE_DRIVE     = 3;    // バランス走行時の角度[度]
+	private static final float P_GAIN               = 2.5F; // 完全停止用モータ制御比例係数
+	private static final int   PWM_ABS_MAX          = 60;   // 完全停止用モータ制御PWM絶対最大値
+	private static final int   SOCKET_PORT          = 7360; // PCと接続するポート
+	private static final int   REMOTE_COMMAND_START = 71;   // 'g'
+	private static final int   REMOTE_COMMAND_STOP  = 83;   // 's'
 	private static final float THRESHOLD = (LIGHT_WHITE + LIGHT_BLACK) / 2.0F; // ライントレースの閾値
 
 	private static ServerSocket server = null;
@@ -158,16 +158,16 @@ public class EV3waySample {
 					forward = 0.0F;
 					turn = 0.0F;
 				} else {
-					forward = 10.0F; // 前進命令
+					forward = 30.0F; // 前進命令
 					if (brightness > THRESHOLD) {
 					//if (body.getBrightness() > THRESHOLD) {
-						turn = 50.0F; // 右旋回命令
+						turn = 30.0F; // 右旋回命令
 					} else {
-						turn = -50.0F; // 左旋回命令
+						turn = -30.0F; // 左旋回命令
 					}
 				}
 
-				//タッチセンサー位置対応（2016.06.29）
+				//センサー位置対応（2016.06.29）
 				//float gyroNow = body.getGyroValue(); // ジャイロセンサー値
 				float gyroNow = -body.getGyroValue(); // ジャイロセンサー値
 				int thetaL = body.motorPortL.getTachoCount(); // 左モータ回転角度
